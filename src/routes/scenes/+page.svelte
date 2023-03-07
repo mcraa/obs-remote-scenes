@@ -9,6 +9,13 @@ Current: {scenes.currentProgramSceneName} - {scenes.currentPreviewSceneName}
 </ul>
 {/if}
 
+<button on:click={()=> {getSourceActive()}}>get source</button>
+{#if source}
+Source: {source.videoActive} - {source.videoShowing}
+{/if}
+
+<button on:click={()=> {createInput()}}>create input</button>
+
 <script lang="ts">
     import { onMount } from 'svelte';
     import obs from '../../modules/obs'
@@ -23,8 +30,36 @@ Current: {scenes.currentProgramSceneName} - {scenes.currentPreviewSceneName}
             currentPreviewSceneName: string;
             scenes: any[];
         }; 
+
+    let source: {
+        videoActive: boolean;
+        videoShowing: boolean;
+    }
     
     async function getScenes() {       
         scenes = await obs.call('GetSceneList')
     }
+
+    async function getSourceActive() {       
+        source = await obs.call('GetSourceActive',  { sourceName: 'Media Source'})
+        console.log(source)
+    }
+    
+    async function createInput() {       
+        // const inputs = await obs.call('GetInputKindList')
+        const defaultSetting = await obs.call('GetInputDefaultSettings', { inputKind: 'ffmpeg_source'})
+        console.log(defaultSetting)
+        const rtmpSettings = await obs.call('GetInputSettings', { inputName: "Media Source"})
+        console.log(rtmpSettings);
+        
+        // const created = await obs.call('CreateInput', {
+        //     sceneName: 'Scene',
+        //     inputKind: 'ffmpeg_source', // select from inputs
+        //     inputName: 'New',
+        //     sceneItemEnabled: true,
+        //     // inputSettings: defaultSettings && customSettings
+        // })
+        // console.log(created)
+    }
+
 </script>
